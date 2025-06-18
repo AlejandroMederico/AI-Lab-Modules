@@ -1,0 +1,24 @@
+# ❌ Carpetas y archivos a ignorar por Git
+
+# Entorno virtual de Python
+env/
+venv/
+
+# Cachés de Python
+__pycache__/
+*.py[cod]
+
+# Bases vectoriales locales (Chroma)
+chroma_db_mpnet/
+
+# Archivos temporales o backups
+*.log
+*.tmp
+*.bak
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# VS Code config personal
+.vscode/
