@@ -10,6 +10,8 @@ __pycache__/
 
 # Bases vectoriales locales (Chroma)
 chroma_db_mpnet/
+chat_history.db
+
 
 # Archivos temporales o backups
 *.log

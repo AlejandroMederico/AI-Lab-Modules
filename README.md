@@ -6,12 +6,12 @@ Este repositorio contiene una serie de módulos prácticos enfocados en aprender
 
 ## 📚 Módulos disponibles
 
-| Módulo | Tema                                               | Estado    |
-|--------|----------------------------------------------------|-----------|
-| 1️⃣     | Embeddings + Búsqueda semántica con ChromaDB      | ✅ Listo   |
-| 2️⃣     | Modelos de lenguaje (LLMs) con Ollama / API       | 🔜 En curso|
-| 3️⃣     | RAG: Retrieval-Augmented Generation               | 🔒 Planificado |
-| 4️⃣     | Agentes de IA con herramientas externas            | 🔒 Planificado |
+| Módulo | Tema                                         | Estado         |
+| ------ | -------------------------------------------- | -------------- |
+| 1️⃣     | Embeddings + Búsqueda semántica con ChromaDB | ✅ Listo       |
+| 2️⃣     | Modelos de lenguaje (LLMs) con Ollama / API  | ✅ Listo       |
+| 3️⃣     | RAG: Retrieval-Augmented Generation          | 🔒 Planificado |
+| 4️⃣     | Agentes de IA con herramientas externas      | 🔒 Planificado |
 
 Cada módulo es independiente y puede ejecutarse por separado.
 
@@ -43,18 +43,21 @@ python main.py
 
 ## 📂 Estructura del proyecto
 
-```
 ai-lab-modules/
-├── module1_embeddings/         # ✅ Buscador semántico con Chroma
-│   ├── main.py
-│   ├── requirements.txt
-│   └── README.md
+├── module1_embeddings/ # ✅ Buscador semántico con Chroma
+│ ├── main.py
+│ ├── requirements.txt
+│ └── README.md
 │
-├── module2_llm_chat/           # 🔜 Chat con modelo local o API
-├── module3_rag_retrieval/      # 🔒 RAG sobre documentos reales
-├── module4_agents/             # 🔒 Agente con herramientas externas
-└── README.md                   # ← Este archivo
-```
+├── module2_llm_chat/ # ✅ Chat con modelo local o API
+│ ├── main.py
+│ ├── db_utils.py
+│ ├── chat_history.db
+│ └── requirements.txt
+│
+├── module3_rag_retrieval/ # 🔒 RAG sobre documentos reales
+├── module4_agents/ # 🔒 Agente con herramientas externas
+└── README.md # ← Este archivo
 
 ---
 
