@@ -10,7 +10,7 @@ Este repositorio contiene una serie de módulos prácticos enfocados en aprender
 | ------ | -------------------------------------------- | -------------- |
 | 1️⃣     | Embeddings + Búsqueda semántica con ChromaDB | ✅ Listo       |
 | 2️⃣     | Modelos de lenguaje (LLMs) con Ollama / API  | ✅ Listo       |
-| 3️⃣     | RAG: Retrieval-Augmented Generation          | 🔒 Planificado |
+| 3️⃣     | RAG: Retrieval-Augmented Generation          | ✅ Listo       |
 | 4️⃣     | Agentes de IA con herramientas externas      | 🔒 Planificado |
 
 Cada módulo es independiente y puede ejecutarse por separado.
@@ -55,7 +55,14 @@ ai-lab-modules/
 │ ├── chat_history.db
 │ └── requirements.txt
 │
-├── module3_rag_retrieval/ # 🔒 RAG sobre documentos reales
+├── module3_rag/ # ✅ RAG sobre documentos reales
+│ ├── ingest.py
+│ ├── main.py
+│ ├── data/
+│ ├── db/
+│ ├── requirements.txt
+│ └── README.md
+│
 ├── module4_agents/ # 🔒 Agente con herramientas externas
 └── README.md # ← Este archivo
 
