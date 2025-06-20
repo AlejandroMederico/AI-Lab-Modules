@@ -17,6 +17,7 @@ __pycache__/
 *.log
 *.tmp
 *.bak
+module1_embeddings/chroma_db_mpnet/
 
 # 🖥️ Archivos del sistema
 .DS_Store
