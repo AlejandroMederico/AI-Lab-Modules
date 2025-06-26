@@ -67,3 +67,9 @@ pnpm-debug.log*
 # Vite output y caché
 frontend/dist/
 frontend/.vite/
+
+# Logs generados por logger
+logs/
+
+# Firebase credentials
+**/firebase-service-account.json
