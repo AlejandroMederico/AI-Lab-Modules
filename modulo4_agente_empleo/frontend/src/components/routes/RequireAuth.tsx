@@ -2,7 +2,7 @@
 import React from 'react';
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { isTokenValid } from '../utils/auth';
+import { isTokenValid } from '../../utils/auth';
 
 interface Props {
   children: ReactNode;

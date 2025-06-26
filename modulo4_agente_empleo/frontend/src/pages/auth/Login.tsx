@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';   // 👈
-import { login as loginApi } from '../api/auth';
+import { login as loginApi } from '../../api/auth';
 import { Link as RouterLink } from 'react-router-dom';
+import { auth, provider } from '../../api/firebase'; 
+import { signInWithPopup } from 'firebase/auth';
+import { loginWithGoogle } from '../../api/auth'; // Asegúrate de tener esta función en tu API
+import { AxiosError } from 'axios';
 import {
   Container,
   TextField,
@@ -51,11 +55,32 @@ const Login = () => {
       // 👉 redirigimos según el rol
       navigate(role === 'admin' ? '/admin' : '/dashboard');
     } catch (err) {
-      console.error(err);
-      setAlertMsg('Correo o contraseña incorrectos');
+      const error = err as AxiosError<{ detail: string }>;
+      const msg = error.response?.data?.detail || 'Correo o contraseña incorrectos';
+      setAlertMsg(msg);
       setSeverity('error');
     }
   };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const firebaseToken = await result.user.getIdToken();
+
+      const { access_token, role } = await loginWithGoogle(firebaseToken);
+
+      localStorage.setItem("token", access_token);
+      localStorage.setItem("role", role);
+      navigate("/dashboard");
+    } catch (err) {
+      const error = err as AxiosError<{ detail: string }>;
+      const msg =
+        error.response?.data?.detail || 'No se pudo iniciar sesión con Google';
+      setAlertMsg(msg);
+      setSeverity('error');
+    }
+  };
+
 
   return (
     <Container maxWidth="sm">
@@ -97,6 +122,16 @@ const Login = () => {
               Registrate aquí
             </Link>
           </Typography>
+
+          <Button
+            onClick={handleGoogleLogin}
+            variant="outlined"
+            color="primary"
+            fullWidth
+            style={{ marginTop: '1rem' }}
+          >
+            Iniciar sesión con Google
+          </Button>
 
           {/* Alerta reutilizable */}
           {alertMsg && (

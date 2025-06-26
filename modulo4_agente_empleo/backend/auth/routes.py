@@ -8,6 +8,7 @@ from backend.auth.dependencies import AdminOnly
 from backend.auth.decorators import User, admin_required
 from backend.auth.schemas import PasswordUpdate
 from backend.auth.auth_service import get_password_hash
+from backend.logger.logger import logger
 
 router = APIRouter(tags=["auth"])
 
@@ -23,11 +24,13 @@ def register(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
     user = models.User(
         email=user_in.email,
         hashed_password=auth_service.get_password_hash(user_in.password),
-        role=user_in.role or "user",  # Default role to 'user' if not provided
+        role=user_in.role or "user",
+        auth_provider="local",
     )
     db.add(user)
     db.commit()
     db.refresh(user)
+    logger.info(f"Usuario registrado exitosamente: {user.email}")
     return user
 
 
@@ -37,12 +40,24 @@ def login(
     db: Session = Depends(get_db),
 ):
     user = get_user_by_email(db, form_data.username)
-    if not user or not auth_service.verify_password(
-        form_data.password, user.hashed_password
-    ):
+    if not user:
+        logger.warning(f"Login fallido: usuario no encontrado ({form_data.username})")
+        raise HTTPException(status_code=401, detail="Credenciales incorrectas")
+
+    if user.auth_provider != "local":
+        logger.warning(f"Login con método incorrecto para {form_data.username}")
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales incorrectas"
+            status_code=400,
+            detail="Este correo fue registrado con autenticación de Google",
         )
+
+    if not auth_service.verify_password(form_data.password, user.hashed_password):
+        logger.warning(
+            f"Login fallido: contraseña incorrecta para {form_data.username}"
+        )
+        raise HTTPException(status_code=401, detail="Credenciales incorrectas")
+
+    logger.info(f"Login exitoso para {user.email} (rol: {user.role})")
     token = auth_service.create_access_token({"sub": str(user.id), "role": user.role})
     return {"access_token": token, "token_type": "bearer", "role": user.role}
 
@@ -68,6 +83,7 @@ def update_user(
 ):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
+        logger.warning(f"Usuario no encontrado con el ID: {user_id} para actualización")
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
     if user_data.email is not None:
@@ -82,6 +98,7 @@ def update_user(
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
+        logger.warning(f"Usuario no encontrado con el ID: {user_id} para eliminación")
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     db.delete(user)
     db.commit()
@@ -115,3 +132,53 @@ def admin_test(current_user: models.User = User()):
         "user": current_user.email,
         "role": current_user.role,
     }
+
+
+@router.post("/auth/google", response_model=schemas.Token)
+def login_with_google(
+    google_data: schemas.GoogleLoginSchema, db: Session = Depends(get_db)
+):
+    try:
+        decoded_token = auth_service.verificar_token_google(google_data.id_token)
+        firebase_uid = decoded_token["uid"]
+        email = decoded_token.get("email")
+
+        if email is None:
+            logger.error("Token de Google válido pero sin email")
+            raise HTTPException(status_code=400, detail="Email no encontrado en token")
+
+        user = db.query(models.User).filter(models.User.email == email).first()
+
+        # ❌ Ya existe pero no es de Google
+        if user and user.auth_provider != "google":
+            logger.warning(f"Intento de login con Google para cuenta local: {email}")
+            raise HTTPException(
+                status_code=400,
+                detail="Este correo ya está registrado con otro método de autenticación",
+            )
+
+        # ✅ No existe: crear nuevo usuario con auth_provider='google'
+        if not user:
+            user = models.User(
+                email=email,
+                firebase_uid=firebase_uid,
+                role="user",
+                auth_provider="google",
+                hashed_password="firebase",  # dummy
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+            logger.info(f"Usuario registrado por Google: {user.email}")
+
+        # Emitir token JWT normal del sistema
+        token = auth_service.create_access_token(
+            data={"sub": str(user.id), "role": user.role}
+        )
+
+        logger.info(f"Login exitoso con Google para {user.email} (rol: {user.role})")
+        return {"access_token": token, "token_type": "bearer", "role": user.role}
+
+    except Exception as e:
+        logger.error(f"Error al verificar token de Google: {e}")
+        raise HTTPException(status_code=401, detail=f"Token de Google inválido: {e}")

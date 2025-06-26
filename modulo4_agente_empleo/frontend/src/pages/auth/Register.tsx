@@ -5,7 +5,7 @@ import {
   Container, Paper, Typography, Box,
   TextField, Button, Alert, Link,
 } from '@mui/material';
-import { register as registerApi } from '../api/auth';  // <-- ADAPTA ESTA RUTA
+import { register as registerApi } from '../../api/auth';  // <-- ADAPTA ESTA RUTA
 
 const Register = () => {
   const [correo, setCorreo] = useState('');

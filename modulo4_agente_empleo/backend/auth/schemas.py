@@ -29,3 +29,7 @@ class Token(BaseModel):
 
 class PasswordUpdate(BaseModel):
     new_password: str
+
+
+class GoogleLoginSchema(BaseModel):
+    id_token: str

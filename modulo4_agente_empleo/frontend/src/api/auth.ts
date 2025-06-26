@@ -4,10 +4,6 @@ import qs from "qs";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8001";
 
-/**
- * Axios instanciado con la URL base del backend.
- * Se agrega un interceptor para adjuntar automáticamente el JWT.
- */
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
 });
@@ -22,35 +18,22 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-/* -------------------------------------------------------------------------- */
-/*                                  Tipados                                   */
-/* -------------------------------------------------------------------------- */
-
+/* ---------------------- Tipado de respuesta de login ---------------------- */
 export interface LoginResponse {
   access_token: string;
   token_type: "bearer";
   role: string;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                   Auth                                     */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Realiza login usando OAuth2PasswordRequestForm.
- * @param username Email del usuario (campo requerido por FastAPI)
- * @param password Contraseña del usuario
- */
+/* --------------------------------- Auth ---------------------------------- */
 export const login = async (
   username: string,
   password: string
 ): Promise<LoginResponse> => {
   const data = qs.stringify({ username, password });
-
   const { data: resp } = await api.post<LoginResponse>("/login", data, {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
   });
-
   return resp;
 };
 
@@ -61,28 +44,13 @@ export const register = async (payload: {
   await api.post("/register", payload);
 };
 
-/**
- * Ejemplo de registro por si lo necesitás (POST /register en tu backend).
- * Descomentalo y adaptalo cuando implementes ese endpoint.
- */
-// export const register = async (payload: {
-//   email: string;
-//   password: string;
-// }): Promise<void> => {
-//   await api.post('/register', payload);
-// };
-
-/* -------------------------------------------------------------------------- */
-/*                       Nueva función: cambiar contraseña                    */
-/* -------------------------------------------------------------------------- */
-
 export interface PasswordChangePayload {
   old_password: string;
   new_password: string;
 }
 
 export interface PasswordChangeResponse {
-  msg: string; // ← según devolvimos en el backend
+  msg: string;
 }
 
 export const changePassword = async (
@@ -92,6 +60,16 @@ export const changePassword = async (
     "/users/me/password",
     payload
   );
+  return data;
+};
+
+/* -------------------------- Login con Google JWT -------------------------- */
+export const loginWithGoogle = async (
+  firebaseToken: string
+): Promise<LoginResponse> => {
+  const { data } = await api.post<LoginResponse>("/auth/google", {
+    id_token: firebaseToken,
+  });
   return data;
 };
 
