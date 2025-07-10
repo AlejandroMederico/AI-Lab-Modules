@@ -1,11 +1,10 @@
 // src/components/RequireAuth.tsx
 import React from 'react';
-import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { isTokenValid } from '../../utils/auth';
 
 interface Props {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 const RequireAuth: React.FC<Props> = ({ children }) => {
@@ -19,7 +18,7 @@ const RequireAuth: React.FC<Props> = ({ children }) => {
     return <Navigate to="/login" state={{ expired: true, from: location }} replace />;
   }
 
-  return children;
+  return <>{children}</>;
 };
 
 export default RequireAuth;

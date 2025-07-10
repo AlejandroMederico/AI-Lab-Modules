@@ -11,6 +11,7 @@ import RequireAuth from './components/routes/RequireAuth';
 import AdminRoute from './components/routes/AdminRoute';
 import ChangePass from './pages/dashboard/ChangePass';
 
+
 export default function App() {
   return (
     <Container disableGutters maxWidth={false}>
@@ -22,32 +23,25 @@ export default function App() {
         <Route path="/register" element={<Register />} />
 
         {/* dashboard para usuarios autenticados */}
-        <Route
-          path="/dashboard"
-          element={
-            <RequireAuth>
-              <UserDashboardWrapper />
-            </RequireAuth>
-          }
-        />
+        <Route path="/dashboard/*" element={
+          <RequireAuth>
+            <UserDashboardWrapper />
+          </RequireAuth>
+        } />
 
         {/* panel exclusivo para admins */}
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminPanelWrapper />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <RequireAuth>
-              <ChangePass/>
-            </RequireAuth>
-          }
-        />
+        <Route path="/admin" element={
+          <AdminRoute>
+            <AdminPanelWrapper />
+          </AdminRoute>
+        } />
+
+        {/* settings */}
+        <Route path="/settings" element={
+          <RequireAuth>
+            <ChangePass />
+          </RequireAuth>
+        } />
       </Routes>
     </Container>
   );
