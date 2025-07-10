@@ -8,6 +8,7 @@ from backend.database import Base, engine
 # Importamos las rutas de autenticación
 from backend.auth import routes as auth_routes
 
+# Importamos las rutas de LinkedIn
 # Crea las tablas si aún no existen
 Base.metadata.create_all(bind=engine)
 
